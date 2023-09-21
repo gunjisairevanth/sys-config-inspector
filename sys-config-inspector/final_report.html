@@ -1,0 +1,111 @@
+<html>
+    <head>
+        <title>{{data["project_name"]}}</title>
+        <style>
+            body{
+                font-family: Arial, Helvetica, sans-serif;
+            }
+            table {
+            font-family: Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+            }
+
+            table td, table th {
+            border: 1px solid #ddd;
+            padding: 8px;
+            }
+
+            table tr:nth-child(even){background-color: #f2f2f2;}
+
+            table tr:hover {background-color: #ddd;}
+
+            table th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #A6A6A6;
+            color: white;
+            }
+            .step_section{
+                float: left;
+            }
+            .expand{
+                background-color: #A6A6A6;
+                width: 10px;
+                padding: 0px 3px 0px 3px;
+                cursor: pointer;
+                float: left;
+                margin: 0px 5px 0px 0px;
+            }
+            .action_item{
+                padding: 10px;
+            }
+            .action_item p{
+                margin: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <h3>Project : {{data["project_name"]}}</h3>
+        <table>
+            <tr>
+                <th>Total Sections</th>
+                <th>Total Steps</th>
+                <th>Status</th>
+            </tr>
+            <tr>
+                <td>{{data["sections"]}}</td>
+                <td>{{data["total_events"]}}</td>
+                {% if data["failed"]>0 %}
+                    <td style="color: red;">Failed</td>
+                {% else %}
+                    <td style="color: green;">Passed</td>
+                {% endif %}
+        
+            </tr>
+        </table>
+
+        {% for event_label in data['events'] %}
+        <h3>{{event_label}}</h3>
+        <table>
+            <tr>
+                <th>Step Name</th>
+                <th>event type</th>
+                <th>Cmd/File Path</th>
+                <th>Time Taken</th>
+                <th>Status</th>
+            </tr>
+
+            {% for each_record in data['events'][event_label] %}
+                <tr>
+                    <td><div class="step_section">{{each_record['step_name']}}</div></td>
+                    <td>{{each_record['event_type']}}</td>
+                    <td>{{each_record['cmd']}}</td>
+                    <td>{{each_record['time_taken']}}</td>
+                    {% if each_record["status"] %}
+                        <td style="color: green;">Passed</td>
+                    {% else %}
+                        <td style="color: red;">Failed</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+
+        </table>
+        {% endfor %}
+
+        <script>
+            function getRowNumber(buttonElement) {
+                var row = buttonElement.parentNode.parentNode.parentNode; // Get the parent row of the button
+                var table = buttonElement.parentNode.parentNode.parentNode.parentNode.parentNode;
+                var rowIndex = parseInt(row.rowIndex)+1; // Get the row index (zero-based)
+                var displayStatus = table.rows[rowIndex].style.display;
+                if (displayStatus === "none") {
+                    table.rows[rowIndex].style.display = "table-row"; 
+                } else {
+                    table.rows[rowIndex].style.display = "none";
+                }
+            }
+        </script>
+    </body>
+</html>
