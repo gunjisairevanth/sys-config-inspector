@@ -21,6 +21,7 @@ setup(
     long_description_content_type="text/markdown",
     long_description=long_description,
     packages=find_packages(),
+    package_data={"sys-config-inspector": ["*.html"]},  # Include HTML files
     install_requires=["PyYAML >= 5.4.1","rich >= 13.4.1", "Jinja2>=3.1.2"],
     keywords=['python', 'video', 'stream', 'video stream', 'camera stream', 'sockets'],
     classifiers=[
