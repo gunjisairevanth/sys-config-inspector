@@ -4,6 +4,7 @@ import time, json
 import logging, os
 from rich.console import Console
 import jinja2
+import argparse
 from rich.table import Table
 from helper_wrapper import log_header, boto3_s3_download, file_overwrite, json_file_content_check, get_cmd, seconds_to_minutes_and_seconds
 
@@ -168,6 +169,15 @@ class SysConfigInspector():
                         return self.process_step(step_config_data['action'])
                 else:
                     return res              
+
+def main():
+    parser = argparse.ArgumentParser(description="SysConfigInspector Command Line Tool")
+    parser.add_argument("--configuration-file", required=True, help="Path to the configuration file")
+    parser.add_argument("--report-location", required=True, help="Path to the report location")
+    args = parser.parse_args()
+    SysConfigInspector(configuration_file=args.configuration_file, report_location=args.report_location)
+    
+
         
-# if __name__ == "__main__":
-#     SysConfigInspector()
+if __name__ == "__main__":
+    main()
