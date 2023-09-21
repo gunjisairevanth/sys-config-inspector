@@ -1,1 +1,1 @@
-from inspector import SysConfigInspector
+from .inspector import SysConfigInspector
