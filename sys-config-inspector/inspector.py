@@ -45,7 +45,7 @@ class SysConfigInspector():
         dir_path = os.path.dirname(os.path.realpath(__file__))
         templateLoader = jinja2.FileSystemLoader(searchpath=f"{dir_path}")
         templateEnv = jinja2.Environment(loader=templateLoader)
-        TEMPLATE_FILE = f"final_report.html"
+        TEMPLATE_FILE = f"{dir_path}/final_report.html"
         template = templateEnv.get_template(TEMPLATE_FILE)
         content = template.render(data=self.result)  # this is where to put args to the template renderer
         if report_location:
