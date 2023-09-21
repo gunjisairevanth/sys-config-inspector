@@ -6,7 +6,7 @@ from rich.console import Console
 import jinja2
 import argparse
 from rich.table import Table
-from helper_wrapper import log_header, boto3_s3_download, file_overwrite, json_file_content_check, get_cmd, seconds_to_minutes_and_seconds
+from .helper_wrapper import log_header, boto3_s3_download, file_overwrite, json_file_content_check, get_cmd, seconds_to_minutes_and_seconds
 
 # Configure the root logger
 logging.basicConfig(
