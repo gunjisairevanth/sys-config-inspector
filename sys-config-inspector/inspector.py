@@ -1,7 +1,7 @@
 import yaml
 import subprocess
 import time, json
-import logging, os
+import logging, os, re
 from rich.console import Console
 import jinja2
 import argparse
@@ -90,17 +90,28 @@ class SysConfigInspector():
             temp['total_events'] += len(list(config_data['sections'][each_section]['events'].keys()))
         return temp
     
-    def path_exist(self,path):
+    def path_exist(self,path, pattern=None):
         try:
-            if os.path.isdir(path):
-                self.logger.debug(f"Folder Exist : {path}")
-                return True
-            elif os.path.isfile(path):
-                self.logger.debug(f"File Exist : {path}")
-                return True
+            if pattern:
+                file_list = os.listdir(path)
+                count=0
+                matching_files = [file for file in file_list if re.match(pattern, file)]
+                for file in matching_files:
+                    count+=1
+                if count>=1:
+                    return True
+                else:
+                    return False
             else:
-                self.logger.debug(f"File or Folder don't exist : {path}")
-                return False
+                if os.path.isdir(path):
+                    self.logger.debug(f"Folder Exist : {path}")
+                    return True
+                elif os.path.isfile(path):
+                    self.logger.debug(f"File Exist : {path}")
+                    return True
+                else:
+                    self.logger.debug(f"File or Folder don't exist : {path}")
+                    return False
         except:
             return False
 
@@ -144,7 +155,7 @@ class SysConfigInspector():
                 else:
                     return res, False
             elif event_type == 'file_check':
-                res=self.path_exist(step_config_data['file'])
+                res=self.path_exist(step_config_data['file'],step_config_data.get("pattern",None))
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
