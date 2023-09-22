@@ -17,9 +17,15 @@ logging.basicConfig(
 
 class SysConfigInspector():
     def __init__(self, configuration_file = None,report_location=None):
+        self.data = {}
         if configuration_file:
-            with open(f"{configuration_file}",'r') as f:
+            with open(f"{configuration_file[0]}",'r') as f:
                 self.data = yaml.safe_load(f)
+            if len(configuration_file) >1:
+                for each_config in configuration_file[1:]:
+                    with open(f"{each_config}",'r') as f:
+                        tmp = yaml.safe_load(f)
+                        self.data['sections'].update(tmp['sections'])
         self.logger = logging.getLogger(__name__)
         self.result = self.get_project_metadetails(self.data)
         self.response = {}
