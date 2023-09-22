@@ -42,7 +42,8 @@ class SysConfigInspector():
                     "event_type" : self.data['sections'][each_section]['events'][each_step]['type'],
                     "cmd" : get_cmd(self.data['sections'][each_section]['events'][each_step]),
                     "time_taken" : response[1],
-                    "status" : response[0]
+                    "status" : response[0],
+                    "modified" : response[2]
                 })
                 self.result['passed'] += (1 if response[0] else 0)
                 self.result['failed'] += (0 if response[0] else 1)
@@ -62,7 +63,7 @@ class SysConfigInspector():
     def start_processing(self,each_step_config):
         with self.console.status("[bold green] Event checks going on ...") as status:
             start_time = time.time()
-            response = self.process_step(each_step_config)
+            response, modified = self.process_step(each_step_config)
             end_time = time.time()
             event_name = each_step_config.get("event_name","")
             execution_time = end_time - start_time
@@ -73,7 +74,7 @@ class SysConfigInspector():
             else:
                 formatted_text = f"{event_name:<{60}} [bold red] [FAIL] [/bold red]"
                 self.console.log(formatted_text)
-            return response, execution_time
+            return response, execution_time, modified
 
     def get_project_metadetails(self,config_data):
         temp = {}
@@ -82,6 +83,7 @@ class SysConfigInspector():
         temp['events'] = 0
         temp['passed'] = 0
         temp['failed'] = 0
+        temp['modified'] = False
         temp['total_events'] = 0
 
         for each_section in config_data['sections']:
@@ -138,43 +140,43 @@ class SysConfigInspector():
                 res=self.execute_bash(command=step_config_data['cmd'],response=step_config_data['response'])
                 if res == False:
                     if "action" in step_config_data:
-                        return self.process_step(step_config_data['action'])
+                        return self.process_step(step_config_data['action'])[0], True
                 else:
-                    return res
+                    return res, False
             elif event_type == 'file_check':
                 res=self.path_exist(step_config_data['file'])
                 if res == False:
                     if "action" in step_config_data:
-                        return self.process_step(step_config_data['action'])
+                        return self.process_step(step_config_data['action'])[0], True
                 else:
-                    return res
+                    return res, False
                 
             elif event_type == 's3_download':
                 res=boto3_s3_download(step_config_data['local_file'],step_config_data['s3_file'])
                 if res == False:
                     if "action" in step_config_data:
-                        return self.process_step(step_config_data['action'])
+                        return self.process_step(step_config_data['action'])[0], True
                 else:
-                    return res
+                    return res, False
 
             elif event_type == 'file_overwrite':
                 res=file_overwrite(step_config_data['content'],step_config_data['file_path'])
                 if res == False:
                     if "action" in step_config_data:
-                        return self.process_step(step_config_data['action'])
+                        return self.process_step(step_config_data['action'])[0], True
                 else:
                     if validate:
-                        return res
+                        return res, False
                     else:
-                        return self.process_step(step_config_data['action'])
+                        return self.process_step(step_config_data['action'])[0], True
                 
             elif event_type == 'json_file_content_check':
                 res=json_file_content_check(step_config_data['content'],step_config_data['file_path'])
                 if res == False:
                     if "action" in step_config_data:
-                        return self.process_step(step_config_data['action'])
+                        return self.process_step(step_config_data['action'])[0], True
                 else:
-                    return res              
+                    return res, False         
 
 def main():
     parser = argparse.ArgumentParser(description="SysConfigInspector Command Line Tool")

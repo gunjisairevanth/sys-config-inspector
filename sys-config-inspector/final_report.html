@@ -62,6 +62,12 @@
                 {% else %}
                     <td style="color: green;">Passed</td>
                 {% endif %}
+
+                {% if data["modified"] %}
+                    <td style="color: #FF914D">Modified</td>
+                {% else %}
+                    <td style="color: green;">No Changes Found</td>
+                {% endif %}
         
             </tr>
         </table>
@@ -87,6 +93,12 @@
                         <td style="color: green;">Passed</td>
                     {% else %}
                         <td style="color: red;">Failed</td>
+                    {% endif %}
+
+                    {% if each_record["modified"] %}
+                        <td style="color: #FF914D">Modified</td>
+                    {% else %}
+                        <td style="color: green;">No Changes Found</td>
                     {% endif %}
                 </tr>
             {% endfor %}
