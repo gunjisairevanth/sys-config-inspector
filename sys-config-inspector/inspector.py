@@ -69,10 +69,10 @@ class SysConfigInspector():
             execution_time = end_time - start_time
             execution_time = seconds_to_minutes_and_seconds(execution_time)
             if response:
-                formatted_text = f"{event_name:<{60}} [bold green] [PASS] [/bold green]"
+                formatted_text = f"{event_name:<{60}} [bold green] [PASS] [/bold green] "+('[MODIFIED] [bold orange]' if modified else '[NO CHANGES] [bold green]')
                 self.console.log(formatted_text)
             else:
-                formatted_text = f"{event_name:<{60}} [bold red] [FAIL] [/bold red]"
+                formatted_text = f"{event_name:<{60}} [bold red] [FAIL] [/bold red] "+ ('[MODIFIED] [bold orange]' if modified else '[NO CHANGES] [bold green]')
                 self.console.log(formatted_text)
             return response, execution_time, modified
 
