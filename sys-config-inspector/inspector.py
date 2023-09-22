@@ -152,6 +152,8 @@ class SysConfigInspector():
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
+                    else:
+                        return False, False
                 else:
                     return res, False
             elif event_type == 'file_check':
@@ -159,6 +161,8 @@ class SysConfigInspector():
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
+                    else:
+                        return False, False
                 else:
                     return res, False
                 
@@ -167,6 +171,8 @@ class SysConfigInspector():
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
+                    else:
+                        return False, False
                 else:
                     return res, False
 
@@ -175,6 +181,8 @@ class SysConfigInspector():
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
+                    else:
+                        return False, False
                 else:
                     if validate:
                         return res, False
@@ -186,6 +194,8 @@ class SysConfigInspector():
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
+                    else:
+                        return False, False
                 else:
                     return res, False         
 
