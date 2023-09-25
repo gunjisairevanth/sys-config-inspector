@@ -45,6 +45,8 @@ class SysConfigInspector():
                     "status" : response[0],
                     "modified" : response[2]
                 })
+                if response[2]:
+                    self.result['modified'] = True
                 self.result['passed'] += (1 if response[0] else 0)
                 self.result['failed'] += (0 if response[0] else 1)
                 
