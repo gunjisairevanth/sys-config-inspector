@@ -17,6 +17,14 @@ if aws_access_key_id and aws_secret_access_key:
     s3_client = boto3.client('s3', aws_access_key_id=aws_access_key_id , aws_secret_access_key=aws_secret_access_key)
 
 
+def set_attr(values):
+    try:
+        for key, value in values.items():
+            globals()[key] = value
+        return True
+    except:
+        return False
+
 def get_cmd(configuration):
     cmd = ["cmd","file","s3_file","file_path"]
     for each_cmd in cmd:

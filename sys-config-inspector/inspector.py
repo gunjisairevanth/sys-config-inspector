@@ -6,7 +6,7 @@ from rich.console import Console
 import jinja2
 import argparse
 from rich.table import Table
-from .helper_wrapper import log_header, boto3_s3_download, file_overwrite, json_file_content_check, get_cmd, seconds_to_minutes_and_seconds
+from .helper_wrapper import log_header, boto3_s3_download, file_overwrite, json_file_content_check, get_cmd, seconds_to_minutes_and_seconds, set_attr
 
 # Configure the root logger
 logging.basicConfig(
@@ -26,6 +26,7 @@ class SysConfigInspector():
                     with open(f"{each_config}",'r') as f:
                         tmp = yaml.safe_load(f)
                         self.data['sections'].update(tmp['sections'])
+                    set_attr(tmp['values'])
         self.logger = logging.getLogger(__name__)
         self.result = self.get_project_metadetails(self.data)
         self.response = {}
@@ -150,7 +151,7 @@ class SysConfigInspector():
         validate = step_config_data.get("validate",True)
         if event_type in valid_event_types:
             if event_type == 'bash':
-                res=self.execute_bash(command=step_config_data['cmd'],response=step_config_data['response'])
+                res=self.execute_bash(command=step_config_data['cmd'].format(**globals()),response=step_config_data['response'])
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
@@ -159,7 +160,7 @@ class SysConfigInspector():
                 else:
                     return res, False
             elif event_type == 'file_check':
-                res=self.path_exist(step_config_data['file'],step_config_data.get("pattern",None))
+                res=self.path_exist(step_config_data['file'].format(**globals()),step_config_data.get("pattern",None))
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
@@ -169,7 +170,7 @@ class SysConfigInspector():
                     return res, False
                 
             elif event_type == 's3_download':
-                res=boto3_s3_download(step_config_data['local_file'],step_config_data['s3_file'])
+                res=boto3_s3_download(step_config_data['local_file'].format(**globals()),step_config_data['s3_file'].format(**globals()))
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
@@ -179,7 +180,7 @@ class SysConfigInspector():
                     return res, False
 
             elif event_type == 'file_overwrite':
-                res=file_overwrite(step_config_data['content'],step_config_data['file_path'])
+                res=file_overwrite(step_config_data['content'].format(**globals()),step_config_data['file_path'].format(**globals()))
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
@@ -192,7 +193,7 @@ class SysConfigInspector():
                         return self.process_step(step_config_data['action'])[0], True
                 
             elif event_type == 'json_file_content_check':
-                res=json_file_content_check(step_config_data['content'],step_config_data['file_path'])
+                res=json_file_content_check(step_config_data['content'].format(**globals()),step_config_data['file_path'].format(**globals()))
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
