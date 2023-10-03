@@ -1,12 +1,12 @@
 import yaml
 import subprocess
 import time, json
-import logging, os, re
+import logging, os
 from rich.console import Console
 import jinja2
 import argparse
 from rich.table import Table
-from .helper_wrapper import log_header, boto3_s3_download, file_overwrite, json_file_content_check, get_cmd, seconds_to_minutes_and_seconds, set_attr
+from .helper_wrapper import log_header, boto3_s3_download, file_overwrite, json_file_content_check, get_cmd, seconds_to_minutes_and_seconds, set_attr, execute_bash, path_exist
 
 # Configure the root logger
 logging.basicConfig(
@@ -16,8 +16,12 @@ logging.basicConfig(
 
 
 class SysConfigInspector():
-    def __init__(self, configuration_file = None,report_location=None):
+    def __init__(self, configuration_file = None,report_location=None, env_values_files=None):
         self.data = {}
+        if env_values_files:
+            with open(f"{env_values_files}",'r') as f:
+                env_file_data = yaml.safe_load(f)
+            set_attr(env_file_data['values'])
         if configuration_file:
             with open(f"{configuration_file[0]}",'r') as f:
                 self.data = yaml.safe_load(f)
@@ -26,7 +30,6 @@ class SysConfigInspector():
                     with open(f"{each_config}",'r') as f:
                         tmp = yaml.safe_load(f)
                         self.data['sections'].update(tmp['sections'])
-                    set_attr(tmp['values'])
         self.logger = logging.getLogger(__name__)
         self.result = self.get_project_metadetails(self.data)
         self.response = {}
@@ -93,56 +96,6 @@ class SysConfigInspector():
             temp['total_events'] += len(list(config_data['sections'][each_section]['events'].keys()))
         return temp
     
-    def path_exist(self,path, pattern=None):
-        try:
-            if pattern:
-                file_list = os.listdir(path)
-                count=0
-                matching_files = [file for file in file_list if re.match(pattern, file)]
-                for file in matching_files:
-                    count+=1
-                if count>=1:
-                    return True
-                else:
-                    return False
-            else:
-                if os.path.isdir(path):
-                    self.logger.debug(f"Folder Exist : {path}")
-                    return True
-                elif os.path.isfile(path):
-                    self.logger.debug(f"File Exist : {path}")
-                    return True
-                else:
-                    self.logger.debug(f"File or Folder don't exist : {path}")
-                    return False
-        except:
-            return False
-
-    def execute_bash(self,command,response):
-        try:
-            start_time = time.time()  # Record the start time
-            self.logger.debug(f"{command} started executing at {start_time}")
-            # Run the Bash command, capture its output as a byte string
-            result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
-            
-            end_time = time.time()  # Record the end time
-
-            # Calculate the duration
-            duration = end_time - start_time
-            self.logger.debug(f"{command} ended executing at {end_time}")
-
-            # Access the standard output and standard error
-            stdout = result.stdout.strip()
-            stderr = result.stderr.strip()
-            if stdout == response:
-                return True
-            else:
-                return False
-
-        except Exception as e:
-            # If the command returns a non-zero exit code, you can handle the error here
-            self.logger.error(f"Error executing command: {e}")
-            return False
 
     def process_step(self,step_config_data):
         log=""
@@ -151,7 +104,7 @@ class SysConfigInspector():
         validate = step_config_data.get("validate",True)
         if event_type in valid_event_types:
             if event_type == 'bash':
-                res=self.execute_bash(command=step_config_data['cmd'].format(**globals()),response=step_config_data['response'])
+                res=execute_bash(command=step_config_data['cmd'],response=step_config_data['response'])
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
@@ -160,7 +113,7 @@ class SysConfigInspector():
                 else:
                     return res, False
             elif event_type == 'file_check':
-                res=self.path_exist(step_config_data['file'].format(**globals()),step_config_data.get("pattern",None))
+                res=path_exist(step_config_data['file'],step_config_data.get("pattern",None))
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
@@ -170,7 +123,7 @@ class SysConfigInspector():
                     return res, False
                 
             elif event_type == 's3_download':
-                res=boto3_s3_download(step_config_data['local_file'].format(**globals()),step_config_data['s3_file'].format(**globals()))
+                res=boto3_s3_download(step_config_data['local_file'],step_config_data['s3_file'])
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
@@ -180,7 +133,7 @@ class SysConfigInspector():
                     return res, False
 
             elif event_type == 'file_overwrite':
-                res=file_overwrite(step_config_data['content'].format(**globals()),step_config_data['file_path'].format(**globals()))
+                res=file_overwrite(step_config_data['content'],step_config_data['file_path'])
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
@@ -193,7 +146,7 @@ class SysConfigInspector():
                         return self.process_step(step_config_data['action'])[0], True
                 
             elif event_type == 'json_file_content_check':
-                res=json_file_content_check(step_config_data['content'].format(**globals()),step_config_data['file_path'].format(**globals()))
+                res=json_file_content_check(step_config_data['content'],step_config_data['file_path'])
                 if res == False:
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
@@ -206,8 +159,9 @@ def main():
     parser = argparse.ArgumentParser(description="SysConfigInspector Command Line Tool")
     parser.add_argument("--configuration-file", nargs='+', required=True, help="Path to the configuration file")
     parser.add_argument("--report-location", required=True, help="Path to the report location")
+    parser.add_argument("--env-values-files", required=False, help="Path to the report location")
     args = parser.parse_args()
-    SysConfigInspector(configuration_file=args.configuration_file, report_location=args.report_location)
+    SysConfigInspector(configuration_file=args.configuration_file, report_location=args.report_location,env_values_files=args.env_values_files)
     
 
         
