@@ -148,7 +148,7 @@ def file_overwrite(content, local_file_path):
             file.write(content)
         return True
     except Exception as e:
-        logger.warning(f"failed to write content in file: {e}")
+        logger.warning(f"failed to write content in file: {e} and content : {content}")
         return False
     
 
