@@ -141,6 +141,8 @@ def boto3_s3_download(local_file_path, s3_path):
 def file_overwrite(content, local_file_path):
     try:
         content = content.format(**globals())
+        content = content.replace("'", "\"")
+        content = json.loads(content)
         local_file_path = local_file_path.format(**globals())
         with open(local_file_path,'w+') as file:
             file.write(content)
