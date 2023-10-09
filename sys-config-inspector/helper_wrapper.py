@@ -71,7 +71,7 @@ def boto3_s3_upload(local_file_path, s3_path):
 
 def path_exist(path, pattern=None):
     try:
-        path = path.format(**globals())
+        # path = path.format(**globals())
         if pattern:
             file_list = os.listdir(path)
             count=0
@@ -98,8 +98,8 @@ def path_exist(path, pattern=None):
 
 def execute_bash(command,response):
     try:
-        command = command.format(**globals())
-        response = response.format(**globals())
+        # command = command.format(**globals())
+        # response = response.format(**globals())
         start_time = time.time()  # Record the start time
         logger.debug(f"{command} started executing at {start_time}")
         # Run the Bash command, capture its output as a byte string
@@ -127,8 +127,8 @@ def execute_bash(command,response):
 
 def boto3_s3_download(local_file_path, s3_path):
     try:
-        local_file_path = local_file_path.format(**globals())
-        s3_path = s3_path.format(**globals())
+        # local_file_path = local_file_path.format(**globals())
+        # s3_path = s3_path.format(**globals())
         s3_path = s3_path.split("s3://")[-1]
         bucket_name = s3_path.split("/")[0]
         s3_path = s3_path.replace(f'{bucket_name}/', '')
@@ -140,8 +140,8 @@ def boto3_s3_download(local_file_path, s3_path):
 
 def file_overwrite(content, local_file_path):
     try:
-        content = content.format(**globals())
-        local_file_path = local_file_path.format(**globals())
+        # content = content.format(**globals())
+        # local_file_path = local_file_path.format(**globals())
         content = content.replace("'", "\"")
         content = json.loads(content)
         with open(local_file_path,'w+') as file:
@@ -154,8 +154,8 @@ def file_overwrite(content, local_file_path):
 
 def json_file_content_check(content, local_file_path):
     try:
-        local_file_path = local_file_path.format(**globals())
-        content = content.format(**globals())
+        # local_file_path = local_file_path.format(**globals())
+        # content = content.format(**globals())
         with open(local_file_path,'r') as file:
             file_content = json.load(file)
         content = content.replace("'", "\"")
