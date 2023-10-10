@@ -142,6 +142,7 @@ def file_overwrite(content, local_file_path):
     try:
         # content = content.format(**globals())
         # local_file_path = local_file_path.format(**globals())
+        os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
         content = content.replace("'", "\"")
         content = json.loads(content)
         with open(local_file_path,'w+') as file:
@@ -156,8 +157,10 @@ def json_file_content_check(content, local_file_path):
     try:
         # local_file_path = local_file_path.format(**globals())
         # content = content.format(**globals())
-        with open(local_file_path,'r') as file:
-            file_content = json.load(file)
+        file_content = {}
+        if os.path.exists(local_file_path):
+            with open(local_file_path,'r') as file:
+                file_content = json.load(file)
         content = content.replace("'", "\"")
         content = json.loads(content)
         if file_content == content:
