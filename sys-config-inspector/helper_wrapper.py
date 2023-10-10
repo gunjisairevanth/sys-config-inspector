@@ -125,17 +125,21 @@ def execute_bash(command,response):
         return False
 
 
-def boto3_s3_download(local_file_path, s3_path):
+def boto3_s3_download(local_folder_path, s3_folder_path):
     try:
-        # local_file_path = local_file_path.format(**globals())
-        # s3_path = s3_path.format(**globals())
-        s3_path = s3_path.split("s3://")[-1]
-        bucket_name = s3_path.split("/")[0]
-        s3_path = s3_path.replace(f'{bucket_name}/', '')
-        s3_client.download_file(bucket_name, s3_path, local_file_path)
+        s3_folder_path = s3_folder_path.strip("s3://")
+        bucket_name, prefix = s3_folder_path.split("/", 1)
+        objects = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
+        os.makedirs(local_folder_path, exist_ok=True)
+
+        for obj in objects.get('Contents', []):
+            key = obj['Key']
+            local_file_path = os.path.join(local_folder_path, os.path.basename(key))
+            s3_client.download_file(bucket_name, key, local_file_path)
+
         return True
     except Exception as e:
-        logger.warning(f"Failed to download file {s3_path} with error {e}")
+        logger.warning(f"Failed to download folder {s3_folder_path} with error: {e}")
         return False
 
 def file_overwrite(content, local_file_path):
