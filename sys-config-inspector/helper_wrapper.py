@@ -146,7 +146,7 @@ def file_overwrite(content, local_file_path):
         content = content.replace("'", "\"")
         content = json.loads(content)
         with open(local_file_path,'w+') as file:
-            file.write(content)
+            json.dump(content,file,indent=4)
         return True
     except Exception as e:
         logger.warning(f"failed to write content in file: {e} and content : {content}, datatype : {type(content)}")
