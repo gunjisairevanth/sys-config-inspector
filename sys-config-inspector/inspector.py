@@ -105,7 +105,7 @@ class SysConfigInspector():
         if event_type in valid_event_types:
             if event_type == 'bash':
                 res=execute_bash(command=step_config_data['cmd'],response=step_config_data['response'])
-                if res == False:
+                if res == False or step_config_data.get("action_required",False):
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
                     else:
@@ -114,7 +114,7 @@ class SysConfigInspector():
                     return res, False
             elif event_type == 'file_check':
                 res=path_exist(step_config_data['file'],step_config_data.get("pattern",None))
-                if res == False:
+                if res == False or step_config_data.get("action_required",False):
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
                     else:
@@ -124,7 +124,7 @@ class SysConfigInspector():
                 
             elif event_type == 's3_download':
                 res=boto3_s3_download(step_config_data['local_file'],step_config_data['s3_file'])
-                if res == False:
+                if res == False or step_config_data.get("action_required",False):
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
                     else:
@@ -134,20 +134,20 @@ class SysConfigInspector():
 
             elif event_type == 'file_overwrite':
                 res=file_overwrite(step_config_data['content'],step_config_data['file_path'])
-                if res == False:
+                if res == False or step_config_data.get("action_required",False):
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
                     else:
                         return False, False
                 else:
                     if validate:
-                        return res, False
-                    else:
                         return self.process_step(step_config_data['action'])[0], True
+                    else:
+                        return res, False
                 
             elif event_type == 'json_file_content_check':
                 res=json_file_content_check(step_config_data['content'],step_config_data['file_path'])
-                if res == False:
+                if res == False or step_config_data.get("action_required",False):
                     if "action" in step_config_data:
                         return self.process_step(step_config_data['action'])[0], True
                     else:
