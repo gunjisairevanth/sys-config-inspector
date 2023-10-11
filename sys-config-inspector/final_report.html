@@ -83,6 +83,7 @@
                 <th>Time Taken</th>
                 <th>Status</th>
                 <th>Actions</th>
+                <th>Last Executed Time</th>
             </tr>
 
             {% for each_record in data['events'][event_label] %}
@@ -102,6 +103,7 @@
                     {% else %}
                         <td style="color: green;">No Changes Found</td>
                     {% endif %}
+                    <td>{{data["project_name"]}}</td>
                 </tr>
             {% endfor %}
 
