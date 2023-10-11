@@ -54,6 +54,7 @@
                 <th>Total Steps</th>
                 <th>Status</th>
                 <th>Actions</th>
+                <th>Last Executed Time</th>
             </tr>
             <tr>
                 <td>{{data["sections"]}}</td>
@@ -69,7 +70,7 @@
                 {% else %}
                     <td style="color: green;">No Changes Found</td>
                 {% endif %}
-        
+                <td>{{data["executed_timestamp"]}}</td>
             </tr>
         </table>
 
@@ -83,7 +84,6 @@
                 <th>Time Taken</th>
                 <th>Status</th>
                 <th>Actions</th>
-                <th>Last Executed Time</th>
             </tr>
 
             {% for each_record in data['events'][event_label] %}
@@ -103,7 +103,6 @@
                     {% else %}
                         <td style="color: green;">No Changes Found</td>
                     {% endif %}
-                    <td>{{data["project_name"]}}</td>
                 </tr>
             {% endfor %}
 

@@ -85,6 +85,7 @@ class SysConfigInspector():
     def get_project_metadetails(self,config_data):
         temp = {}
         temp['project_name'] = config_data['project_name']
+        temp['executed_timestamp'] = config_data.get("executed_timestamp","")
         temp['sections'] = len(list(config_data['sections'].keys()))
         temp['events'] = 0
         temp['passed'] = 0
