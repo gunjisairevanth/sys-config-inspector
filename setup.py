@@ -12,7 +12,7 @@ DESCRIPTION = 'This package helps to do the basic sysem check and generate html 
 
 # Setting up
 setup(
-    name="sys-config-inspector",
+    name="sys_config_inspector",
     version=VERSION,
     author="Sai (Sai Revanth)",
     author_email="gunji.sairevanth@gmail.com",
@@ -20,9 +20,9 @@ setup(
     long_description_content_type="text/markdown",
     long_description=long_description,
     packages=find_packages(),
-    package_data={"sys-config-inspector": ["*.html"]},  # Include HTML files
+    package_data={"sys_config_inspector": ["*.html"]},  # Include HTML files
     install_requires=["PyYAML >= 5.4.1","rich >= 13.4.1", "Jinja2>=3.1.2"],
-    keywords=['python', 'sys-config-inspector', 'sys-config', 'inspector', 'config-inspector', 'sys config inspector'],
+    keywords=['python', 'sys_config_inspector', 'sys_config_inspector', 'inspector', 'config-inspector', 'sys config inspector'],
     classifiers=[
         "Development Status :: 1 - Planning"
     ],
