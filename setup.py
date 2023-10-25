@@ -4,12 +4,11 @@ import os
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-# with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
-#     long_description = "\n" + fh.read()
+with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
+    long_description = "\n" + fh.read()
 
-VERSION = '0.0.2'
-DESCRIPTION = ''
-long_description=""
+VERSION = '0.0.3'
+DESCRIPTION = 'This package helps to do the basic sysem check and generate html report'
 
 # Setting up
 setup(
