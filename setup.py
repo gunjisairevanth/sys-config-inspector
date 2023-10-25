@@ -23,7 +23,7 @@ setup(
     packages=find_packages(),
     package_data={"sys-config-inspector": ["*.html"]},  # Include HTML files
     install_requires=["PyYAML >= 5.4.1","rich >= 13.4.1", "Jinja2>=3.1.2"],
-    keywords=['python', 'video', 'stream', 'video stream', 'camera stream', 'sockets'],
+    keywords=['python', 'sys-config-inspector', 'sys-config', 'inspector', 'config-inspector', 'sys config inspector'],
     classifiers=[
         "Development Status :: 1 - Planning"
     ],
